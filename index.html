@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks - Todo List App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #1a1a2e;
+            --bg-card: #16213e;
+            --accent-primary: #e94560;
+            --accent-secondary: #0f3460;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0a0;
+            --success: #4ecca3;
+            --danger: #ff6b6b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            font-weight: 300;
+            color: var(--text-secondary);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--accent-secondary);
+            border-radius: 8px;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-area input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-area input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .input-area button {
+            padding: 14px 20px;
+            background-color: var(--accent-primary);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .input-area button:hover {
+            background-color: #d63d56;
+            transform: scale(1.05);
+        }
+
+        .input-area button:active {
+            transform: scale(0.95);
+        }
+
+        .todo-list {
+            list-style: none;
+            margin-bottom: 24px;
+            min-height: 100px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background-color: var(--bg-main);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateX(4px);
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .todo-item.completed .checkbox {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .todo-item.completed .checkbox::after {
+            content: '✓';
+            color: var(--bg-main);
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-secondary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox:hover {
+            border-color: var(--success);
+        }
+
+        .todo-text {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s ease;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+
+        .todo-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 40px 20px;
+        }
+
+        .footer-stats {
+            padding-top: 16px;
+            border-top: 1px solid var(--accent-secondary);
+        }
+
+        .stats-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--accent-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-8px);
+            }
+
+            75% {
+                transform: translateX(8px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+
+            .input-area button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>My Tasks</h1>
+            <p class="subtitle"><span id="pending-count">0</span> tasks pending</p>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="todo-input" placeholder="Add a new task...">
+            <button id="add-btn">+</button>
+        </div>
+
+        <ul class="todo-list" id="todo-list">
+            <li class="empty-state" id="empty-state">No tasks yet. Add one above!</li>
+        </ul>
+
+        <div class="footer-stats">
+            <p class="stats-text"><span id="completed-count">0</span> of <span id="total-count">0</span> tasks completed
+            </p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let todos = [];
+
+        // DOM Elements
+        const todoInput = document.getElementById('todo-input');
+        const addBtn = document.getElementById('add-btn');
+        const todoList = document.getElementById('todo-list');
+        const emptyState = document.getElementById('empty-state');
+        const pendingCount = document.getElementById('pending-count');
+        const completedCount = document.getElementById('completed-count');
+        const totalCount = document.getElementById('total-count');
+        const progressFill = document.getElementById('progress-fill');
+
+        // Load todos from localStorage
+        function loadTodos() {
+            const stored = localStorage.getItem('todos');
+            if (stored) {
+                todos = JSON.parse(stored);
+            }
+            renderTodos();
+        }
+
+        // Save todos to localStorage
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // Add todo
+        function addTodo(text) {
+            if (!text.trim()) {
+                todoInput.classList.add('shake');
+                setTimeout(() => todoInput.classList.remove('shake'), 300);
+                return;
+            }
+
+            const todo = {
+                id: Date.now(),
+                text: text.trim(),
+                completed: false
+            };
+
+            todos.push(todo);
+            saveTodos();
+            renderTodos();
+            todoInput.value = '';
+        }
+
+        // Toggle todo completion
+        function toggleTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos();
+                renderTodos();
+            }
+        }
+
+        // Delete todo
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+            renderTodos();
+        }
+
+        // Render todos
+        function renderTodos() {
+            todoList.innerHTML = '';
+
+            if (todos.length === 0) {
+                todoList.innerHTML = '<li class="empty-state">No tasks yet. Add one above!</li>';
+            } else {
+                todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                    li.innerHTML = `
+                        <div class="checkbox" onclick="toggleTodo(${todo.id})"></div>
+                        <span class="todo-text" title="${todo.text}">${todo.text}</span>
+                        <button class="delete-btn" onclick="deleteTodo(${todo.id})">🗑</button>
+                    `;
+                    todoList.appendChild(li);
+                });
+            }
+
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = todos.length;
+            const completed = todos.filter(t => t.completed).length;
+            const pending = total - completed;
+
+            pendingCount.textContent = pending;
+            completedCount.textContent = completed;
+            totalCount.textContent = total;
+
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+            progressFill.style.width = `${percentage}%`;
+        }
+
+        // Event Listeners
+        addBtn.addEventListener('click', () => addTodo(todoInput.value));
+
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo(todoInput.value);
+            }
+        });
+
+        // Make functions global for inline onclick
+        window.toggleTodo = toggleTodo;
+        window.deleteTodo = deleteTodo;
+
+        // Initialize
+        loadTodos();
+    </script>
+</body>
+
+</html>
